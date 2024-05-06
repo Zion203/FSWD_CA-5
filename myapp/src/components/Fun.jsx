@@ -1,10 +1,19 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios"
 
 function Fun() {
   const colors = ["red", "blue", "green", "grey", "pink", "yellow", "black" , "orange" , "blueviolet","aqua"];
   const [index, setIndex] = useState(0);
   const [time, setTime] = useState(0);
   const [toggel, settoggel] = useState(false);
+
+  const [data,setData] = useState([{name : "" , Gender : "" , id : ""}])
+  const [userdata,setUSerData] = useState([{name : "" , Gender : "" , id : ""}])
+  const [name,setname] = useState('')
+  const [Gender , setGender] = useState('')
+  const [id , setId] = useState("")
+
+  
 
   const setCookie = (name, value, time) => {
     let d = new Date();
@@ -16,6 +25,7 @@ function Fun() {
   const timer = (toggel) => {
     if (toggel) {
       setTimeout(() => {
+        fetch(time)
         if (time % 2 != 0) {
           chnageColor(index);
         }
@@ -32,6 +42,8 @@ function Fun() {
     setTimeout(() => {
       setCookie("time", null, null);
     }, 1000);
+
+    
   };
 
   const chnageColor = (index) => {
@@ -45,11 +57,50 @@ function Fun() {
     }
   };
 
+
+  const fetch = async (time) =>{
+    try{
+      const response = await axios.get(`http://localhost:3000/getuser/:${time}`)
+      console.log(response)
+      if (response != null){
+        console.log(11)
+        console.log(response.data)
+        setData(response.data)
+      }else{
+        console.log(11111)
+        setData({name : "" , Gender : "" , id : ""})
+      }
+      
+      // settempData(response.data)
+    }catch(err){
+      console.log(err)
+    }
+  }
+
   useEffect(() => {
     if (toggel) {
       timer(toggel);
     }
-  });
+  },[time,toggel]);
+
+
+  const  handelChnage = (e) =>{
+    const input = e.target.value
+    const name = e.target.name
+    setUSerData((prev) => prev.name = input)
+  } 
+
+
+  const handelSubmit = async(e) => {
+    e.preventDefault();
+    try{
+      const response = await axios.post(`http://localhost:3000/postdata` , {id : id , name : name , Gender : Gender})
+      console.log(response)
+      // settempData(response.data)
+    }catch(err){
+      console.log(err)
+    }
+  }
 
   return (
     <>
@@ -85,6 +136,25 @@ function Fun() {
         </div>
       </div>
       <p>Please Give full mark🙏</p>
+
+      {
+        
+           data && (
+            <div key={index}>
+            <p>Name : {data.name}</p>
+            <p>Gender : {data.Gender}</p>
+          </div>
+           )
+         
+      }
+
+
+      <form onSubmit={handelSubmit}>
+        <input type="text" name="name" onChange={(e)=>setname(e.target.value)} placeholder="Name.." />
+        <input type="text" name="Gender" onChange={(e)=>{setGender(e.target.value)}} placeholder="Gender.." />
+        <input type="text" name="id" onChange={(e)=>{setId(e.target.value)}} placeholder="ID" />
+        <button type="submit">SUbmit</button>
+      </form>
     </>
   );
 }

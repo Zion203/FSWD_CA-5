@@ -1,0 +1,19 @@
+meta {
+  name: post ra
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:3000/postdata
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name" : "Zion",
+    "Gender" : "male",
+    "id" :1
+  }
+}
